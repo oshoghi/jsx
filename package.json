@@ -1,6 +1,6 @@
 {
   "name": "jsx-xray",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "a react component to print out the jsx passed into it",
   "main": "index.js",
   "scripts": {

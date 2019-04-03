@@ -126,6 +126,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
     background-color: #f9f9f9;
     position: relative;
     overflow: unset;
+    padding: 20px;
 }
 
 .jsx-xray.with-demo pre {
@@ -136,7 +137,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
     display: inline-block;
     overflow: hidden;
     height: 25px;
-    top: 1px;
+    top: 0;
     left: 0;
     position: absolute;
     transform: translate(50%, -100%);
@@ -147,7 +148,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
     content: "";
     border: 15px solid transparent;
     border-bottom-color: #f9f9f9;
-    filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.15)) drop-shadow(1px 0px 1px rgba(0, 0, 0, 0.15));
+    filter: drop-shadow(0px 1px 0.5px rgba(0, 0, 0, 0.15)) drop-shadow(1px 0px 0.5px rgba(0, 0, 0, 0.15));
     position: relative;
     top: -5px;
 }
