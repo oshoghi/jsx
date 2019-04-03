@@ -4,6 +4,8 @@ import { highlight } from "highlightjs";
 function serialize (value) {
     if (typeof(value) === "function") {
         return "{function () { ... }}";
+    } else if ((value.type && value.props) || value.type && value.type.displayName) {
+        return `{${buildJsxString(value)}}`.replace(/\n/g, "").replace(/    /g, "");
     } else if (typeof(value) === "object") {
         return `{${JSON.stringify(value)}}`;
     } else {

@@ -92,4 +92,20 @@ describe("Jsx component", function () {
     </MyComponent>
 </div>`);
     });
+
+    it("Renders with props that is a build in react component", function () {
+        const wrapper = render({
+            children: <MyComponent myProp={<div>blah</div>} />
+        });
+
+        wrapper.assertJsxString("<MyComponent myProp={<div>blah</div>} />");
+    });
+
+    it("Renders with props that is a react component", function () {
+        const wrapper = render({
+            children: <MyComponent myProp={<MyComponent>blah</MyComponent>} />
+        });
+
+        wrapper.assertJsxString("<MyComponent myProp={<MyComponent>blah</MyComponent>} />");
+    });
 });
