@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { highlight } from "highlightjs";
+import { highlight, registerLanguage } from "highlight.js/lib/highlight.js";
+
+registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 
 function serialize (value) {
     if (typeof(value) === "function") {

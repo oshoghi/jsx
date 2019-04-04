@@ -1,7 +1,11 @@
 {
   "name": "jsx-xray",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "a react component to print out the jsx passed into it",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:oshoghi/jsx.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "TZ=US/Pacific NODE_PATH=src jest --watchAll",
@@ -46,7 +50,7 @@
     "babel-loader": "^8.0.5",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
-    "highlightjs": "9.12.0",
+    "highlight.js": "^9.15.6",
     "jest": "^24.6.0",
     "mini-css-extract-plugin": "0.5.0",
     "react": "^16.8.6",
