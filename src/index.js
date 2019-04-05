@@ -1,7 +1,8 @@
-import React, { Component } from "react";
-import { highlight, registerLanguage } from "highlight.js/lib/highlight.js";
+import React from "react";
+import Prism from 'prismjs';
 
-registerLanguage("xml", require("highlight.js/lib/languages/xml"));
+import"prismjs/components/prism-jsx";
+import "prismjs/themes/prism.css";
 
 function serialize (value) {
     if (typeof(value) === "function") {
@@ -29,6 +30,10 @@ function indent (amount) {
 function buildJsxString (component, indentLevel=0) {
     if (typeof(component) === "string") {
         return component;
+    }
+
+    if (Array.isArray(component)) {
+        return component.map((c) => buildJsxString(c, indentLevel)).join("\n\n");
     }
 
     const { props } = component;
@@ -65,10 +70,10 @@ function buildJsxString (component, indentLevel=0) {
 }
 
 function extractCode (children, highlightFn) {
-    const child = Array.isArray(children) ? children[0] : children;
-
-    return highlightFn("xml", buildJsxString(child)).value;
+    return highlightFn(buildJsxString(children))
 }
+
+const highlight = (code) => Prism.highlight(code, Prism.languages.jsx);
 
 function Jsx ({ children, highlightFn=highlight, render=true }={}) {
     return (
@@ -95,4 +100,3 @@ function Jsx ({ children, highlightFn=highlight, render=true }={}) {
 };
 
 export default Jsx;
-
