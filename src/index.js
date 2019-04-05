@@ -4,11 +4,20 @@ import Prism from 'prismjs';
 import"prismjs/components/prism-jsx";
 import "prismjs/themes/prism.css";
 
-function serialize (value) {
+function serialize (value, propName, context) {
     if (typeof(value) === "function") {
         return "{function () { ... }}";
     } else if ((value.type && value.props) || value.type && value.type.displayName) {
-        return `{${buildJsxString(value)}}`.replace(/\n/g, "").replace(/    /g, "");
+        const str = `${buildJsxString(value, 0, context)}`.replace(/    /g, "");
+
+        if (str.length > 32 && context.extractVars) {
+            context.vars[propName] = context.vars[propName] || [];
+            context.vars[propName].push(str);
+
+            return `{${propName + context.vars[propName].length}}`;
+        }
+
+        return `{${str.replace(/(\n|____)/g, "")}}`;
     } else if (typeof(value) === "object") {
         return `{${JSON.stringify(value)}}`;
     } else {
@@ -17,30 +26,30 @@ function serialize (value) {
 }
 
 function indent (amount) {
-    const spaces = amount * 4;
     let str = "";
 
-    for (let i = 0; i < spaces; i++) {
-        str += " ";
+    for (let i = 0; i < amount; i++) {
+        str += "____";
     }
 
     return str;
 }
 
-function buildJsxString (component, indentLevel=0) {
+function buildJsxString (component, indentLevel, context) {
+    debugger;
     if (typeof(component) === "string") {
         return component;
     }
 
     if (Array.isArray(component)) {
-        return component.map((c) => buildJsxString(c, indentLevel)).join("\n\n");
+        return component.map((c) => buildJsxString(c, indentLevel, context)).join("\n\n");
     }
 
     const { props } = component;
     const type = component.type.displayName || component.type;
     const propKeys = Object.keys(props).filter((k) => k !== "children");
     const propsArray = propKeys.map((key, i) => {
-        const value = serialize(component.props[key]);
+        const value = serialize(component.props[key], key, context);
 
         if (propKeys.length === 1) {
             return `${key}=${value}`;
@@ -56,11 +65,11 @@ function buildJsxString (component, indentLevel=0) {
 
         if (Array.isArray(props.children)) {
             children = props.children
-                .map((c) => buildJsxString(c, indentLevel + 1))
+                .map((c) => buildJsxString(c, indentLevel + 1, context))
                 .map((c) => "\n" + padding + c)
                 .join("\n") + "\n";
         } else {
-            children = padding + buildJsxString(props.children, indentLevel + 1);
+            children = padding + buildJsxString(props.children, indentLevel + 1, context);
         }
 
         return `<${type}${propsString && propsArray.length === 1 ? " " : ""}${propsString}>\n${children}\n${indent(indentLevel)}</${type}>`;
@@ -69,13 +78,31 @@ function buildJsxString (component, indentLevel=0) {
     return `<${type}${propsString && " "}${propsString} />`;
 }
 
-function extractCode (children, highlightFn) {
-    return highlightFn(buildJsxString(children))
+function printVar (name, value) {
+    return `const ${name} = (\n${value.split("\n").map((l) => indent(1) + l).join("\n")}\n);`;
+}
+
+function extractCode (children, extractVars, highlightFn) {
+    const context = { vars: [], extractVars };
+    let markup = buildJsxString(children, 0, context);
+    const varsStr = Object.keys(context.vars)
+        .map((propName) => {
+            if (context.vars[propName].length === 1) {
+                markup = markup.replace(new RegExp(`${propName}1`), `${propName}`);
+
+                return printVar(propName, context.vars[propName][0]);
+            } else {
+                return context.vars[propName].map((v, i) => printVar(propName + (i + 1), v)).join("\n\n");
+            }
+        })
+        .join("\n\n");
+
+    return highlightFn((varsStr + "\n\n" + markup)).replace(/____/g, "<span>    </span>");
 }
 
 const highlight = (code) => Prism.highlight(code, Prism.languages.jsx);
 
-function Jsx ({ children, highlightFn=highlight, render=true }={}) {
+function Jsx ({ children, highlightFn=highlight, render=true, extractVars=false }={}) {
     return (
         <div className={"jsx-xray" + (render ? " with-demo" : "")}>
             {
@@ -93,7 +120,7 @@ function Jsx ({ children, highlightFn=highlight, render=true }={}) {
                   <span className="arrow-container">
                   </span>
                 }
-                <code className="" dangerouslySetInnerHTML={{ __html: extractCode(children, highlightFn) }} />
+                <code className="" dangerouslySetInnerHTML={{ __html: extractCode(children, extractVars, highlightFn) }} />
             </pre>
         </div>
     );
