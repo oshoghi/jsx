@@ -20,25 +20,31 @@ MyFunctionalComponent.displayName = "MyFunctionalComponent";
 describe("Jsx component", function () {
     function render (_opts) {
         const opts = Object.assign({
-            highlightFn: jest.fn().mockReturnValue({})
+            highlightFn: (str) => str,
+            onRender: jest.fn(),
         }, _opts);
 
         const wrapper = mount(<Jsx {...opts} />);
 
-        wrapper.assertJsxString = (str) => expect(wrapper.props().highlightFn).toBeCalledWith("xml", str);
+        wrapper.assertJsxString = (str) => expect(wrapper.props().onRender).toBeCalledWith(str);
 
         return wrapper;
     }
 
-    it("renders simple component", function () {
+    it("renders simple component as one line", function () {
         const wrapper = render({
             children: <span>blah</span>
         });
 
-        wrapper.assertJsxString(
-`<span>
-    blah
-</span>`);
+        wrapper.assertJsxString(`<span>blah</span>`);
+    });
+
+    it("renders many simple props in 1 line", function () {
+        const wrapper = render({
+            children: <span a="1" b="2" c="3" d="4">blah</span>
+        });
+
+        wrapper.assertJsxString(`<span a="1" b="2" c="3" d="4">blah</span>`);
     });
 
     it("Renders with children", function () {
@@ -46,12 +52,7 @@ describe("Jsx component", function () {
             children: <span className="blah" title="my-title">blah</span>
         });
 
-        wrapper.assertJsxString(
-`<span
-    className="blah"
-    title="my-title">
-    blah
-</span>`);
+        wrapper.assertJsxString(`<span className="blah" title="my-title">blah</span>`);
     });
 
     it("Renders with nesting", function () {
@@ -87,13 +88,11 @@ describe("Jsx component", function () {
 
         wrapper.assertJsxString(
 `<div>
-    <MyComponent>
-        blah
-    </MyComponent>
+    <MyComponent>blah</MyComponent>
 </div>`);
     });
 
-    it("Renders with props that is a build in react component", function () {
+    it("Renders with props that is a built-in react component", function () {
         const wrapper = render({
             children: <MyComponent myProp={<div>blah</div>} />
         });

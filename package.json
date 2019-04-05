@@ -1,6 +1,6 @@
 {
   "name": "jsx-xray",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "a react component to print out the jsx passed into it",
   "repository": {
     "type": "git",
@@ -50,9 +50,10 @@
     "babel-loader": "^8.0.5",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
-    "prismjs": "^1.16.0",
     "jest": "^24.6.0",
+    "json-stringify-pretty-compact": "^2.0.0",
     "mini-css-extract-plugin": "0.5.0",
+    "prismjs": "^1.16.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "uglifyjs-webpack-plugin": "^2.1.2",
