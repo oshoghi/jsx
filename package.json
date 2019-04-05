@@ -1,6 +1,6 @@
 {
   "name": "jsx-xray",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "a react component to print out the jsx passed into it",
   "repository": {
     "type": "git",
