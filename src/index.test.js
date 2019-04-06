@@ -26,10 +26,33 @@ describe("Jsx component", function () {
 
         const wrapper = mount(<Jsx {...opts} />);
 
-        wrapper.assertJsxString = (str) => expect(wrapper.props().onRender).toBeCalledWith(str);
+        wrapper.assertJsxString = (str) => expect(wrapper.props().onRender).toBeCalledWith(str, expect.anything());
+        wrapper.assertVarsString = (str) =>expect(wrapper.props().onRender).toBeCalledWith(expect.anything(), str); 
 
         return wrapper;
     }
+
+    it("multi-lines big json", function () {
+        const json = {
+            obj1: { value: 1 },
+            obj2: { value: 2 },
+            obj3: [1, 2, 3]
+        };
+
+        const wrapper = render({
+            children: <MyComponent prop1={json} />
+        });
+
+        wrapper.assertJsxString(`<MyComponent prop1={prop1} />`);
+    });
+
+    it("doesnt multi-line inline json", function () {
+        const wrapper = render({
+            children: <MyComponent prop1={[1, 2, 3, 4, 5]} />
+        });
+
+        wrapper.assertJsxString(`<MyComponent prop1={[1, 2, 3, 4, 5]} />`);
+    });
 
     it("renders simple component as one line", function () {
         const wrapper = render({
@@ -41,10 +64,10 @@ describe("Jsx component", function () {
 
     it("renders many simple props in 1 line", function () {
         const wrapper = render({
-            children: <span a="1" b="2" c="3" d="4">blah</span>
+            children: <span a="1" b="2" c="3">blah</span>
         });
 
-        wrapper.assertJsxString(`<span a="1" b="2" c="3" d="4">blah</span>`);
+        wrapper.assertJsxString(`<span a="1" b="2" c="3">blah</span>`);
     });
 
     it("Renders with children", function () {
@@ -52,7 +75,12 @@ describe("Jsx component", function () {
             children: <span className="blah" title="my-title">blah</span>
         });
 
-        wrapper.assertJsxString(`<span className="blah" title="my-title">blah</span>`);
+        wrapper.assertJsxString(
+`<span
+    className="blah"
+    title="my-title">
+    blah
+</span>`);
     });
 
     it("Renders with nesting", function () {
@@ -69,11 +97,8 @@ describe("Jsx component", function () {
         wrapper.assertJsxString(
 `<div>
     <MyComponent>
-
         <MyFunctionalComponent param=\"1\" />
-
         <MyFunctionalComponent param=\"2\" />
-
     </MyComponent>
 </div>`);
     });

@@ -153,6 +153,7 @@ pre[class*="language-"] {
     position: relative;
     overflow: unset;
     padding: 20px;
+    overflow: hidden;
 }
 
 .jsx-xray.with-demo pre {

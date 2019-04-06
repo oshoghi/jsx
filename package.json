@@ -9,7 +9,8 @@
   "main": "index.js",
   "scripts": {
     "test": "TZ=US/Pacific NODE_PATH=src jest --watchAll",
-    "pack": "NODE_ENV='production' webpack --progress --colors --bail --config webpack.config.js"
+    "pack": "NODE_ENV='production' webpack --progress --colors --bail --config webpack.config.js",
+    "dev": "NODE_ENV='production' webpack --watch --progress --colors --bail --config webpack.config.js"
   },
   "dependencies": {},
   "keywords": [
@@ -54,6 +55,7 @@
     "json-stringify-pretty-compact": "^2.0.0",
     "mini-css-extract-plugin": "0.5.0",
     "prismjs": "^1.16.0",
+    "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "uglifyjs-webpack-plugin": "^2.1.2",
