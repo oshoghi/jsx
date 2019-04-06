@@ -3,10 +3,6 @@ JSX Xray for React is a component that will render its children but will also re
 as you interact with your storybook demos, the jsx always matches what's
 rendered on screen.
 
-Note that in order for the component names to be displayed correctly,
-you MUST have displayName set for the components which you pass into
-XRay.
-
 #Github
 https://github.com/oshoghi/jsx
 
@@ -45,7 +41,7 @@ JSX XRay comes with some reasonable defaults but you can override these
 by passing it the appropriate props:
 
 ## substituteThreshold
-The default value is 80 chars.  This prop controls the length at which point
+The default value is 40 chars.  This prop controls the length at which point
 XRay will swap out prop values and substitute them with variables.  Eg:
 
 ```js

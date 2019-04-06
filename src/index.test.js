@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import { mount } from "enzyme";
 import Jsx from "./index.js";
+import { isReactComponent } from "./utils.js";
+
+class MyUnnamedComponent extends Component {
+    render () {
+        return null;
+    }
+}
 
 class MyComponent extends Component {
     static displayName = "MyComponent";
@@ -44,6 +51,14 @@ describe("Jsx component", function () {
         });
 
         wrapper.assertJsxString(`<MyComponent prop1={prop1} />`);
+    });
+
+    it("deals with unnamed components", function () {
+        const wrapper = render({
+            children: <MyUnnamedComponent />
+        });
+
+        wrapper.assertJsxString(`<MyUnnamedComponent />`);
     });
 
     it("doesnt multi-line inline json", function () {

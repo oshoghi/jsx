@@ -17,9 +17,23 @@ export const indent = function (amount, indentStr="____") {
     return str;
 };
 
-export const getComponentName = (component) => component.type.displayName || component.type || "Component";
+export const getComponentName = (component) => {
+    const name = component.type.displayName || component.type;
 
-export const isReactComponent = (obj) => obj && ((obj.type && obj.props) || obj.type && obj.type.displayName);
+    if (typeof(name) === "string") {
+        return name;
+    }
+
+    //if no display name is set, try to pull it out from the class name
+    const parts = component.type.toString().match(/function ([^ (]*)/)
+    if (parts) {
+        return parts[1];
+    }
+
+    return "Component";
+};
+
+export const isReactComponent = (obj) => !!(obj && ((obj.type && obj.props) || (obj.type && obj.type.displayName)));
 
 export const serializeFnForComponent = (propName, value, context) => buildJsxString(value, context, 0);
 
@@ -48,12 +62,12 @@ export const substituteForVarIfTooLong = function (propName, value, context, ser
 export const serializeProperty = function (propName, value, context) {
     if (value === null) {
         return "{null}";
-    } else if (typeof(value) === "function") {
-        return "{function () { ... }}";
     } else if (isReactComponent(value)) {
         return substituteForVarIfTooLong(propName, value, context, serializeFnForComponent);
     } else if (typeof(value) === "object") {
         return substituteForVarIfTooLong(propName, value, context, serializeFnForObject);
+    } else if (typeof(value) === "function") {
+        return "{function () { ... }}";
     } else if (typeof(value) === "number" || typeof(value) === "boolean") {
         return `{${value}}`;
     } else {
