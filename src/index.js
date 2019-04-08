@@ -4,6 +4,7 @@ import injectCss from "./inlineCss";
 import "prismjs/components/prism-jsx";
 import { indent, buildJsxString } from "./utils";
 import PropTypes from "prop-types";
+import { CollapsibleBox } from "./CollapsibleBox";
 
 const highlight = (code) => Prism.highlight(code, Prism.languages.jsx);
 
@@ -60,40 +61,74 @@ function extractCode (children, context) {
  *
  *  <div id={id} />
  */
-function Jsx ({ children, highlightFn=highlight, jsxOnly=false, onRender, substituteThreshold=40, oneLineThreshold=40 }={}) {
-    const context = { vars: [], highlightFn, oneLineThreshold, substituteThreshold };
-    const { markupRaw, markup, vars, varsRaw } = extractCode(children, context);
+class Jsx extends Component {
+    state = {
+        open: false
+    };
 
-    injectCss();
-
-    if (onRender) {
-        onRender(markupRaw, varsRaw);
+    componentDidMount () {
+        this._addTitleForUnnamed();
     }
 
-    return (
-        <div className={"jsx-xray" + (!jsxOnly ? " with-demo" : "")}>
-            {
-                !jsxOnly &&
-                <div className="jsx-xray--rendered-component">
-                    { children }
-                </div>
-            }
-            <pre>
+    componentDidUpdate () {
+        this._addTitleForUnnamed();
+    }
+
+    _addTitleForUnnamed () {
+        if (this.jsxContainer) {
+            Array.from(this.jsxContainer.querySelectorAll(".class-name"))
+                .filter((node) => node.innerText === "UnnamedComponent")
+                .forEach((node) => node.title = "Component displayName not set in definition.  Please update your class to have a displayName");
+        }
+    }
+
+    _toggleOpen = () => this.setState({ open: !this.state.open });
+
+    render () {
+        const { children, highlightFn=highlight, jsxOnly=false, substituteThreshold=40, oneLineThreshold=40 } = this.props;
+        const context = { vars: [], highlightFn, oneLineThreshold, substituteThreshold };
+        const { markupRaw, markup, vars, varsRaw } = extractCode(children, context);
+
+        injectCss();
+
+        if (this.props.onRender) {
+            this.props.onRender(markupRaw, varsRaw);
+        }
+
+        const varsButton = (
+            <span className="jsx-xray--vars-toggle">
+                { this.state.open ? "Hide" : "Show"} variables
+            </span>
+        );
+
+        return (
+            <div className={"jsx-xray" + (!jsxOnly ? " with-demo" : "")}>
                 {
-                  !jsxOnly &&
-                  <span className="arrow-container">
-                  </span>
+                    !jsxOnly &&
+                    <div className="jsx-xray--rendered-component">
+                        { children }
+                    </div>
                 }
-                <code>
-                    {
-                        substituteThreshold !== -1 && vars &&
-                        <div dangerouslySetInnerHTML={{ __html: vars + "<br/><br/>" }} />
-                    }
-                    <div className="jsx-xray--markup" dangerouslySetInnerHTML={{ __html: markup }} />
-                </code>
-            </pre>
-        </div>
-    );
+                <pre>
+                    <code>
+                        {
+                            substituteThreshold !== -1 && vars &&
+                            <CollapsibleBox
+                                header={varsButton}
+                                open={this.state.open}
+                                onHeaderClick={this._toggleOpen}
+                            >
+                                <div dangerouslySetInnerHTML={{ __html: vars + "<br/><br/>" }} />
+                            </CollapsibleBox>
+                        }
+                        <div ref={(ref) => this.jsxContainer = ref}
+                            className="jsx-xray--markup"
+                            dangerouslySetInnerHTML={{ __html: markup }} />
+                    </code>
+                </pre>
+            </div>
+        );
+    }
 };
 
 Jsx.propTypes = {

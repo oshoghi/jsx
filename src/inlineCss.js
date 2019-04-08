@@ -1,3 +1,5 @@
+//import FA from "./fa";
+
 export default function () {
     if (document && !document.getElementById("jsx-xray-style")) {
         const element = document.createElement("style");
@@ -146,6 +148,66 @@ pre[class*="language-"] {
 
 .token.entity {
 	cursor: help;
+}
+
+.collapsible-box.clip .collapsible-box-body {
+    overflow: hidden;
+}
+
+.collapsible-box-body {
+    transition: all 0.4s ease;
+}
+
+.collapsible-box-header {
+    cursor: pointer;
+}
+
+@keyframes pulse {
+    0% {
+      opacity: 1
+      box-shadow: 0px 0px 1px;
+    }
+    50% {
+        opacity: 0.6;
+        box-shadow: 0px 0px 10px;
+    }
+    100% {
+      opacity: 1
+      box-shadow: 0px 0px 1px;
+    }
+}
+
+.pulse {
+    position: relative;
+    display: inline-block;
+    padding: 5px;
+    box-shadow: 0px 0px 1px;
+    border-radius: 100px;
+}
+
+.pulse:before {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    content: "";
+    left: 0;
+    top: 0;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-name: pulse;
+    border-radius: 100px;
+}
+
+.jsx-xray--vars-toggle {
+    padding: 10px;
+    margin: 0;
+    background: #555;
+    color: #f0f0f0;
+    display: block;
+    margin-bottom: 15px;
+    border-radius: 3px;
+    font-family: initial;
 }
 
 .jsx-xray pre {

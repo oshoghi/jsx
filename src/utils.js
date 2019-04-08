@@ -26,11 +26,11 @@ export const getComponentName = (component) => {
 
     //if no display name is set, try to pull it out from the class name
     const parts = component.type.toString().match(/function ([^ (]*)/)
-    if (parts) {
+    if (parts && parts[1]) {
         return parts[1];
     }
 
-    return "Component";
+    return "UnnamedComponent";
 };
 
 export const isReactComponent = (obj) => !!(obj && ((obj.type && obj.props) || (obj.type && obj.type.displayName)));
