@@ -4,41 +4,79 @@ import injectCss from "./inlineCss";
 import "prismjs/components/prism-jsx";
 import { indent, buildJsxString } from "./utils";
 import PropTypes from "prop-types";
-import { CollapsibleBox } from "./CollapsibleBox";
+import classnames from "classnames";
 
 const highlight = (code) => Prism.highlight(code, Prism.languages.jsx);
 
-function printVar (name, value) {
-    return `const ${name} = (\n${value.split("\n").map((l) => indent(1) + l).join("\n")}\n);`;
-}
-
 function extractCode (children, context) {
     let markup = buildJsxString(children, context, 0);
+    const vars = [];
 
-    const varsStr = context.substituteThreshold !== -1 && (Object.keys(context.vars)
-        .filter((propName) => context.vars[propName].length)
-        .map((propName) => {
-            if (context.vars[propName].length === 1) {
-                markup = markup.replace(new RegExp(`${propName}1`), `${propName}`);
+    if (context.substituteThreshold !== -1) {
+        Object.keys(context.vars)
+            .filter((propName) => context.vars[propName].length)
+            .forEach((propName) => {
+                if (context.vars[propName].length === 1) {
+                    markup = markup.replace(new RegExp(`${propName}1`), `${propName}`);
+                }
 
-                return printVar(propName, context.vars[propName][0]);
-            } else {
-                return context.vars[propName].map((v, i) => printVar(propName + (i + 1), v)).join("\n\n");
-            }
-        })
-        .join("\n\n"));
+                context.vars[propName].forEach((v, i, arr) => {
+                    vars.push({
+                        name: propName + (arr.length > 1  ? (i + 1) : ""),
+                        value: v.split("\n").map((l) => indent(1) + l).join("\n"),
+                    });
+                });
+            });
+    }
 
     return {
         markupRaw: markup.replace(/____/g, "    "),
         markup: context.highlightFn(markup).replace(/____/g, "<span>    </span>"),
-        varsRaw: varsStr.replace(/____/g, "    "),
-        vars: context.highlightFn(varsStr || "").replace(/____/g, "<span>    </span>"),
+        //varsRaw: varsStr.replace(/____/g, "    "),
+        vars,
+
+        //context.highlightFn(varsStr || "").replace(/____/g, "<span>    </span>"),
     };
+}
+
+class JsxVariable extends Component {
+    state = {
+        expanded: false
+    };
+
+    _toggle = () => this.setState({ expanded: !this.state.expanded });
+
+    render () {
+        const { name, value } = this.props;
+        const className = classnames("jsx-xray-variable", this.state.expanded && "expanded");
+
+        return (
+            <div className={className}>
+                <span className="token keyword">const</span>
+                <span> {name}</span>
+                <span className="token operator"> = </span>
+                <span className="token punctuation">(</span>
+
+                <span className="jsx-xray-variable-expand" onClick={this._toggle}>
+                {
+                    this.state.expanded
+                    ? <span dangerouslySetInnerHTML={{ __html: highlight("\n" + value.replace(/  /g, "    ")).replace(/____/g, "<span>    </span>") }} />
+                    : <span className="jsx-xray-variable-placeholder"><span>...</span></span>
+                }
+                </span>
+
+                <span className="token punctuation">);</span>
+                <br />
+                <br />
+
+            </div>
+        );
+    }
 }
 
 /*
  * @param {function} highlightFn
- *  - Mostly here for unit testing purposes, but allows you to override the default syntax highlighter
+ *  - Mostly here for unit testing purposes, but allows you to override the default andsyntax highlighter
  *
  * @param {function} onRender
  *  - Also mostly here for the unit tests to verify the raw string that will be passed into the highlighter
@@ -62,10 +100,6 @@ function extractCode (children, context) {
  *  <div id={id} />
  */
 class Jsx extends Component {
-    state = {
-        open: false
-    };
-
     componentDidMount () {
         this._addTitleForUnnamed();
     }
@@ -82,8 +116,6 @@ class Jsx extends Component {
         }
     }
 
-    _toggleOpen = () => this.setState({ open: !this.state.open });
-
     render () {
         const { children, highlightFn=highlight, jsxOnly=false, substituteThreshold=40, oneLineThreshold=40 } = this.props;
         const context = { vars: [], highlightFn, oneLineThreshold, substituteThreshold };
@@ -94,12 +126,6 @@ class Jsx extends Component {
         if (this.props.onRender) {
             this.props.onRender(markupRaw, varsRaw);
         }
-
-        const varsButton = (
-            <span className="jsx-xray--vars-toggle">
-                { this.state.open ? "Hide" : "Show"} variables
-            </span>
-        );
 
         return (
             <div className={"jsx-xray" + (!jsxOnly ? " with-demo" : "")}>
@@ -112,15 +138,12 @@ class Jsx extends Component {
                 <pre>
                     <code>
                         {
-                            substituteThreshold !== -1 && vars &&
-                            <CollapsibleBox
-                                header={varsButton}
-                                open={this.state.open}
-                                onHeaderClick={this._toggleOpen}
-                            >
-                                <div dangerouslySetInnerHTML={{ __html: vars + "<br/><br/>" }} />
-                            </CollapsibleBox>
+                            this.props.info &&
+                            <div className="jsx-xray-code-info">{this.props.info}</div>
                         }
+
+                        { vars.map((v) => <JsxVariable {...v} />) }
+
                         <div ref={(ref) => this.jsxContainer = ref}
                             className="jsx-xray--markup"
                             dangerouslySetInnerHTML={{ __html: markup }} />

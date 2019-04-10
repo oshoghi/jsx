@@ -150,70 +150,43 @@ pre[class*="language-"] {
 	cursor: help;
 }
 
-.collapsible-box.clip .collapsible-box-body {
-    overflow: hidden;
-}
-
-.collapsible-box-body {
-    transition: all 0.4s ease;
-}
-
-.collapsible-box-header {
+.jsx-xray-variable-expand {
     cursor: pointer;
 }
 
-@keyframes pulse {
-    0% {
-      opacity: 1
-      box-shadow: 0px 0px 1px;
-    }
-    50% {
-        opacity: 0.6;
-        box-shadow: 0px 0px 10px;
-    }
-    100% {
-      opacity: 1
-      box-shadow: 0px 0px 1px;
-    }
-}
-
-.pulse {
+.jsx-xray-variable-placeholder,
+.jsx-xray-variable-placeholder > span {
+    display: inline-block;
     position: relative;
-    display: inline-block;
-    padding: 5px;
-    box-shadow: 0px 0px 1px;
-    border-radius: 100px;
 }
 
-.pulse:before {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-    content: "";
-    left: 0;
-    top: 0;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-    animation-name: pulse;
-    border-radius: 100px;
+.jsx-xray-variable-placeholder {
+    background-color: #ccc;
+    border-radius: 20px;
+    height: 10px;
+    overflow: hidden;
+    top: 2px;
 }
 
-.jsx-xray--vars-toggle {
-    padding: 10px;
-    margin: 0;
-    background: #555;
-    color: #f0f0f0;
-    display: block;
-    margin-bottom: 15px;
-    border-radius: 3px;
-    font-family: initial;
+.jsx-xray-code-info {
+    background: #eee;
+    padding: 10px 20px;
+    margin-left: -20px;
+    margin-top: -20px;
+    width: calc(100% + 40px);
+    margin-bottom: 10px;
+}
+
+.jsx-xray-variable-placeholder > span {
+    top: -6px;
+}
+
+.jsx-xray-variable-placeholder:hover {
+    background-color: #999;
 }
 
 .jsx-xray pre {
     background-color: #f9f9f9;
-    position: relative;
-    overflow: unset;
     padding: 20px;
     overflow: hidden;
 }
@@ -221,23 +194,4 @@ pre[class*="language-"] {
 .jsx-xray.with-demo pre {
     margin-top: 25px;
 }
-
-.jsx-xray pre > .arrow-container {
-    display: inline-block;
-    overflow: hidden;
-    height: 25px;
-    top: 0;
-    left: 0;
-    position: absolute;
-    transform: translate(50%, -100%);
-}
-
-.jsx-xray pre > .arrow-container:before {
-    display: inline-block;
-    content: "";
-    border: 15px solid transparent;
-    border-bottom-color: #f9f9f9;
-    filter: drop-shadow(0px 1px 0.5px rgba(0, 0, 0, 0.15)) drop-shadow(1px 0px 0.5px rgba(0, 0, 0, 0.15));
-    position: relative;
-    top: -5px;
-}`;
+`;

@@ -39,6 +39,8 @@ export const serializeFnForComponent = (propName, value, context) => buildJsxStr
 
 export const serializeFnForObject = (propName, value, context) => stringify(value);
 
+export const serializeFnForString = (propname, value, context) => `"${value.toString()}"`;
+
 /*
  * Jsx becomes hard to read if there are too many long inline props.  For anything beyond a certain
  * threshold specified in the context, pull the value out and replace with a variable instead.
@@ -53,6 +55,10 @@ export const substituteForVarIfTooLong = function (propName, value, context, ser
         vars[propName].push(serializedValue);
 
         return `{${propName + vars[propName].length}}`;
+    }
+
+    if (typeof(value) === "string") {
+        return serializeFn(propName, value, forceOneLineContext);
     }
 
     //inline props should always be on the same line
@@ -71,7 +77,7 @@ export const serializeProperty = function (propName, value, context) {
     } else if (typeof(value) === "number" || typeof(value) === "boolean") {
         return `{${value}}`;
     } else {
-        return `"${value.toString()}"`;
+        return substituteForVarIfTooLong(propName, value, context, serializeFnForString);
     }
 }
 
@@ -98,9 +104,10 @@ export const buildJsxString = function (component, context, indentLevel=0, _join
     }
 
     const { props } = component;
+    const defaultProps = component.type.defaultProps || {};
     const childObjects = getChildren(component).map((c) => buildJsxString(c, context, indentLevel + 1));
     const propsArray = Object.keys(props)
-        .filter((k) => k !== "children")
+        .filter((k) => k !== "children" && props[k] !== defaultProps[k])
         .map((key, i) => ({
             key,
             value: serializeProperty(key, component.props[key], context)
